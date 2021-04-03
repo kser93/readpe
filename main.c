@@ -57,7 +57,6 @@ int main(int argc, char* argv[])
 		{
 			++progname;
 		}
-		printf("[%p] %s\n", progname, progname);
 
 		usage(progname);
 		target_name = argv[0];
