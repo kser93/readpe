@@ -41,7 +41,6 @@ int main(int argc, char* argv[])
 	char* target_name = NULL;
 	FILE* fp = NULL;
 	int e_code = 0;
-	size_t read_size = 0;
 
 	if (argc != 2)
 	{
@@ -76,19 +75,15 @@ int main(int argc, char* argv[])
 		errprint("PE_FILE", target_last_name, EINVAL);
 	}
 
-	/* parse PE magic which must be equal MZ */
 	char pe_buf[PE_BUF_SIZE];
-	read_size = fread((void*)pe_buf, sizeof(char), PE_MAGIC_SIZE, fp);
-	pe_buf[read_size] = '\0';
-	if (strncmp(pe_buf, "MZ", PE_MAGIC_SIZE) != 0)
+	struct ms_dos_stub* stub_p = (struct ms_dos_stub*)pe_buf;
+	fread((void*)stub_p, sizeof(ms_dos_stub), 1, fp);
+	if (stub_p->e_magic != DOSMAGIC)
 	{
 		fclose(fp);
 		errprint("PE_MAGIC", pe_buf, EINVAL);
 	}
 
-	struct ms_dos_stub* stub_p = (struct ms_dos_stub*)pe_buf;
-	rewind(fp);
-	read_size = fread((void *)stub_p, sizeof(ms_dos_stub), 1, fp);
 	dump_dos_stub(stub_p);
 
 	e_code = fseek(fp, stub_p->e_lfanew, SEEK_SET);
