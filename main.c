@@ -95,9 +95,13 @@ int main(int argc, char* argv[])
 	if (e_code != 0)
 	{
 		fclose(fp);
-		// ...
+
+		char errmsg_buf[20];
+		sprintf(errmsg_buf, "e_lfanew = 0x%X", stub_p->e_lfanew);
+		errprint("PE_DOSHDR", errmsg_buf, EINVAL);
 	}
 
+	// ...
 	fclose(fp);
 	return 0;
 }
