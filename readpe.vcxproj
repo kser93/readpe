@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="ms_dos_stub.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ms_dos_stub.h" />

@@ -68,4 +68,6 @@ typedef struct ms_dos_stub
 	char dos_program[64];   /* MS-DOS, stuf always follow DOS header.  */
 } ms_dos_stub;
 
+void dump_dos_stub(ms_dos_stub* hdr);
+
 #endif /* _COFF_MS_DOS_STUB_H */

@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 	struct ms_dos_stub* stub_p = (struct ms_dos_stub*)pe_buf;
 	rewind(fp);
 	read_size = fread((void *)stub_p, sizeof(ms_dos_stub), 1, fp);
-	// TODO: nonstrict validate MS-DOS stub via header comment values
+	dump_dos_stub(stub_p);
 
 	e_code = fseek(fp, stub_p->e_lfanew, SEEK_SET);
 	if (e_code != 0)
