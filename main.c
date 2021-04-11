@@ -4,12 +4,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ms_dos_header.h"
+#include "pe_guts.h"
 
 #define ERRBUF_SIZE 128
 #define PE_BUF_SIZE 0x1000
-#define PE_MAGIC_SIZE 2
 
+FILE* fp = NULL;
+char* pe_buf = NULL;
+
+void free_resources()
+{
+	if (pe_buf != NULL)
+	{
+		free(pe_buf);
+		pe_buf = NULL;
+	}
+	if (fp != NULL)
+	{
+		fclose(fp);
+		fp = NULL;
+	}
+}
 
 void usage(char* progname)
 {
@@ -25,7 +40,7 @@ void usage(char* progname)
 	printf("%61s\n", "By default examines itself.");
 }
 
-_Noreturn void errprint(char* cause, char* errvalue, int errcode)
+_Noreturn void die(char* cause, char* errvalue, int errcode)
 {
 	char *errbuf = strerror(errcode);
 	if (errbuf == NULL)
@@ -33,13 +48,14 @@ _Noreturn void errprint(char* cause, char* errvalue, int errcode)
 		abort();
 	}
 	printf("[%s] %s: %s\n", cause, errvalue, errbuf);
+	free_resources();
 	exit(errcode);
 }
 
 int main(int argc, char* argv[])
 {
 	char* target_name = NULL;
-	FILE* fp = NULL;
+	fp = NULL;
 	int e_code = 0;
 
 	if (argc != 2)
@@ -71,31 +87,49 @@ int main(int argc, char* argv[])
 	{
 		char* target_last_name = strrchr(target_name, '\\');
 		target_last_name = (target_last_name == NULL) ? target_name : target_last_name + 1;
-		errprint("PE_FILE", target_last_name, EINVAL);
+		die("SYS", target_last_name, EINVAL);
 	}
 
-	char pe_buf[PE_BUF_SIZE];
-	struct dos_header* stub_p = (struct dos_header*)pe_buf;
-	fread((void*)stub_p, sizeof(dos_header), 1, fp);
-	if (stub_p->e_magic != DOSMAGIC)
+	pe_buf = (char *)calloc(PE_BUF_SIZE, 1);
+	if (pe_buf == NULL)
 	{
-		fclose(fp);
-		errprint("PE_MAGIC", pe_buf, EINVAL);
+		die("SYS", "pe_buf", EINVAL);
 	}
 
-	dump_dos_header(stub_p);
+	image_dos_header_t *dos_heaher_p = (image_dos_header_t *)pe_buf;
+	fread((void *)dos_heaher_p, sizeof(image_dos_header_t), 1, fp);
+	if (dos_heaher_p->e_magic != DOSMAGIC)
+	{
+		die("DOS_MAGIC", pe_buf, EINVAL);
+	}
 
-	e_code = fseek(fp, stub_p->e_lfanew, SEEK_SET);
+	dump_dos_header(dos_heaher_p);
+
+	e_code = fseek(fp, dos_heaher_p->e_lfanew, SEEK_SET);
 	if (e_code != 0)
 	{
-		fclose(fp);
-
 		char errmsg_buf[20];
-		sprintf(errmsg_buf, "e_lfanew = 0x%X", stub_p->e_lfanew);
-		errprint("PE_DOSHDR", errmsg_buf, EINVAL);
+		sprintf(errmsg_buf, "e_lfanew = 0x%X", dos_heaher_p->e_lfanew);
+		die("PE_DOSHDR", errmsg_buf, EINVAL);
 	}
 
-	// ...
-	fclose(fp);
+	image_nt_headers32_t *nt_headers32_p = (image_nt_headers32_t *)pe_buf;
+	//image_nt_headers64_t *nt_headers64_p = (image_nt_headers64_t *)pe_buf;
+
+	fread((void *)nt_headers32_p, sizeof(image_nt_headers32_t), 1, fp);
+	if (nt_headers32_p->signature != PEMAGIC)
+	{
+		die("PE_MAGIC", pe_buf, EINVAL);
+	}
+
+	// TODO: ImageBase: image_nt_headers[32|64]_t.image_optional_header[32|64]_t.ImageBase
+	// TODO: EntryPoint: image_nt_headers[32|64]_t.image_optional_header[32|64]_t.AddressOfEntryPoint
+	// TODO: SizeOfImage: image_nt_headers[32|64]_t.image_optional_header[32|64]_t.SizeOfImage
+	// For each section (NumberOfSections: image_nt_headers[32|64]_t.image_file_header_t.NumberOfSections)
+	// TODO: SectionName: image_nt_headers[32|64]_t.image_section_header_t.Name
+	// TODO: Characteristics: image_nt_headers[32|64]_t.image_section_header_t.Characteristics
+	// Use MSDN rules: [https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_section_header?redirectedfrom=MSDN#members]
+
+	free_resources();
 	return 0;
 }

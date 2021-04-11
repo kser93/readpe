@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ms_dos_header.h"
+#include "pe_guts.h"
 
 // dirty hack to make this code compile in both MSVC and gcc
 #define uint64_t unsigned long long
 
-dos_header reference_header = {
+image_dos_header_t reference_header = {
 	.e_magic = DOSMAGIC,
 	.e_cblp = 0x90,
 	.e_cp = 0x3,
@@ -29,7 +29,7 @@ dos_header reference_header = {
 	.e_lfanew = 0x80,
 };
 
-void dump_dos_header(dos_header *hdr)
+void dump_dos_header(image_dos_header_t *hdr)
 {
 	char *default_color = "\x1B[0m";
 	char *diff_color = "\x1B[33m";

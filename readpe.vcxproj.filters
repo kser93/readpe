@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
+    <ClCompile Include="pe_guts.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ms_dos_header.c">
+    <ClCompile Include="main.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ms_dos_header.h">
+    <ClInclude Include="pe_guts.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

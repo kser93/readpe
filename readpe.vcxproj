@@ -142,10 +142,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="ms_dos_header.c" />
+    <ClCompile Include="pe_guts.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ms_dos_header.h" />
+    <ClInclude Include="pe_guts.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
