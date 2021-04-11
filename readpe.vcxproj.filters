@@ -18,12 +18,12 @@
     <ClCompile Include="main.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="ms_dos_stub.c">
+    <ClCompile Include="ms_dos_header.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ms_dos_stub.h">
+    <ClInclude Include="ms_dos_header.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

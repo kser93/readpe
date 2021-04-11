@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ms_dos_stub.h"
+#include "ms_dos_header.h"
 
 #define ERRBUF_SIZE 128
 #define PE_BUF_SIZE 0x1000
@@ -75,15 +75,15 @@ int main(int argc, char* argv[])
 	}
 
 	char pe_buf[PE_BUF_SIZE];
-	struct ms_dos_stub* stub_p = (struct ms_dos_stub*)pe_buf;
-	fread((void*)stub_p, sizeof(ms_dos_stub), 1, fp);
+	struct dos_header* stub_p = (struct dos_header*)pe_buf;
+	fread((void*)stub_p, sizeof(dos_header), 1, fp);
 	if (stub_p->e_magic != DOSMAGIC)
 	{
 		fclose(fp);
 		errprint("PE_MAGIC", pe_buf, EINVAL);
 	}
 
-	dump_dos_stub(stub_p);
+	dump_dos_header(stub_p);
 
 	e_code = fseek(fp, stub_p->e_lfanew, SEEK_SET);
 	if (e_code != 0)

@@ -43,7 +43,7 @@
 /* Magic values that are true for all dos/nt implementations.  */
 #define DOSMAGIC 0x5a4d  
 
-typedef struct ms_dos_stub
+typedef struct dos_header
 {
 	/* DOS header fields - always at offset zero in the EXE file.  */
 	uint16_t e_magic;       /* Magic number, 0x5a4d. (DOSMAGIC above) */
@@ -65,9 +65,8 @@ typedef struct ms_dos_stub
 	uint16_t e_oeminfo;     /* OEM information; e_oemid specific, 0x0.  */
 	uint16_t e_res2[10];    /* Reserved words, all 0x0.  */
 	uint32_t e_lfanew;      /* File address of new exe header, usually 0x80.  */
-	char dos_program[64];   /* MS-DOS, stuf always follow DOS header.  */
-} ms_dos_stub;
+} dos_header;
 
-void dump_dos_stub(ms_dos_stub* hdr);
+void dump_dos_header(dos_header* hdr);
 
 #endif /* _COFF_MS_DOS_STUB_H */
